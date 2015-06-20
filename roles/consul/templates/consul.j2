@@ -1,0 +1,2 @@
+#!/bin/sh -x
+docker run -d --name consul --net host consul agent -data-dir /tmp/consul -server -advertise {{ ansible_eth1.ipv4.address }} {{ flags }}

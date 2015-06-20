@@ -1,0 +1,2 @@
+#!/bin/sh -x
+docker run -d --name zookeeper --net host -v /srv/zookeeper/zoo.cfg:/opt/zookeeper/conf/zoo.cfg:ro zookeeper

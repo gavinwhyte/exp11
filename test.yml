@@ -1,0 +1,6 @@
+---
+- include: tests/test01.yml
+#- include: tests/test02.yml
+- include: tests/test03.yml
+- include: tests/test04.yml
+- include: tests/test05.yml

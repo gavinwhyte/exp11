@@ -1,0 +1,21 @@
+---
+- file: path=/srv/zookeeper state=directory
+  
+- template: src=zoo.cfg.j2 dest=/srv/zookeeper/zoo.cfg
+  register: result1
+
+- template: src=zookeeper.j2 dest=/usr/local/sbin/docker-zookeeper mode=0755
+  register: result2
+
+# build
+- file: path=/usr/src/zookeeper state=absent
+- copy: src=./ dest=/usr/src/zookeeper
+
+- shell: docker build -t zookeeper . chdir=/usr/src/zookeeper
+
+# remote
+- shell: docker rm -f zookeeper
+  ignore_errors: true
+
+# create
+- shell: /usr/local/sbin/docker-zookeeper

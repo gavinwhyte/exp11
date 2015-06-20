@@ -1,0 +1,8 @@
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/tmp/zookeeper
+clientPort=2181
+{% for node in groups['nodes'] %}
+server.{{ loop.index }}={{ hostvars[node]['ansible_eth1']['ipv4']['address'] }}:2888:3888
+{% endfor %}

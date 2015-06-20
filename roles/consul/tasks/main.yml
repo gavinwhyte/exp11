@@ -1,0 +1,16 @@
+---
+- template: src=consul.j2 dest=/usr/local/sbin/docker-consul mode=0755
+  register: result
+
+# build
+- file: path=/usr/src/consul state=absent
+- copy: src=./ dest=/usr/src/consul
+
+- shell: docker build -t consul . chdir=/usr/src/consul
+
+# remote
+- shell: docker rm -f consul
+  ignore_errors: true
+
+# create
+- shell: /usr/local/sbin/docker-consul

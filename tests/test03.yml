@@ -1,0 +1,6 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: docker run --net host --rm consul members | grep ^node-1
+    - shell: docker run --net host --rm consul members | grep ^node-2
+    - shell: docker run --net host --rm consul members | grep ^node-3

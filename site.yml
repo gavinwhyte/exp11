@@ -1,0 +1,27 @@
+---
+- hosts: nodes
+  roles:
+    - common
+    - docker
+
+- include: tests/test01.yml
+#- include: tests/test02.yml
+
+- hosts: node-1
+  roles:
+    - { role: consul, flags: -bootstrap }
+
+- hosts:
+    - node-2
+    - node-3
+  roles:
+    - { role: consul, flags: "-join {{ hostvars['node-1']['ansible_eth1']['ipv4']['address'] }}" }
+    
+- include: tests/test03.yml
+- include: tests/test04.yml
+
+- hosts: nodes
+  roles:
+    - zookeeper
+
+- include: tests/test05.yml

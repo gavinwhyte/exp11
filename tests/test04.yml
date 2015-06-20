@@ -1,0 +1,20 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: test -z "`curl http://localhost:8500/v1/kv/foo`"
+      
+- hosts: node-1
+  tasks:
+    - shell: curl -f -X PUT -d 'bar' http://localhost:8500/v1/kv/foo
+
+- hosts: node-2
+  tasks:
+    - shell: curl -f http://localhost:8500/v1/kv/foo | grep 'YmFy'
+
+- hosts: node-3
+  tasks:
+    - shell: curl -f -X DELETE http://localhost:8500/v1/kv/foo
+      
+- hosts: nodes
+  tasks:
+    - shell: test -z "`curl http://localhost:8500/v1/kv/foo`"

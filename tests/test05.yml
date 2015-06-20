@@ -1,0 +1,20 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: test -z "`echo ls / | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh 2> /dev/null | grep foo`"
+
+- hosts: node-1
+  tasks:
+    - shell: echo create /foo bar | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh
+
+- hosts: node-2
+  tasks:
+    - shell: echo get /foo | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh 2> /dev/null | grep ^bar
+
+- hosts: node-3
+  tasks:
+    - shell: echo delete /foo | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh
+
+- hosts: nodes
+  tasks:
+    - shell: test -z "`echo ls / | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh 2> /dev/null | grep foo`"

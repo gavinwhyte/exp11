@@ -1,0 +1,8 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: docker run --rm hello-world
+
+    - shell: test `docker run --rm centos:7 stat -c %a /` = 755
+
+    - shell: "docker info | grep 'Udev Sync Supported: true'"

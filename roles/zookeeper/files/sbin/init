@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e -x
+
+MYID=`echo $HOSTNAME | awk -F- '{print $NF}'`
+
+echo $MYID > /tmp/zookeeper/myid
+exec /opt/zookeeper/bin/zkServer.sh "$@"

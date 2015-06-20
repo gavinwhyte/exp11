@@ -1,0 +1,17 @@
+---
+# update
+- yum: name=* state=latest
+
+# reboot
+- stat: path=/var/run/reboot-required
+  register: st
+
+- shell: reboot
+  ignore_errors: true
+  when: st.stat.exists
+
+- local_action: wait_for port=22 host="{{ ansible_ssh_host | default(inventory_hostname) }}" search_regex=OpenSSH delay=30
+  when: st.stat.exists
+
+# epel
+- yum: name=epel-release

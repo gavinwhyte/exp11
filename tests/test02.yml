@@ -1,0 +1,23 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: docker rm -f test02
+      ignore_errors: true
+  
+    - shell: docker run -d --name test02 --restart always centos:7 sleep 300
+
+    - shell: docker inspect test02 | grep 'Running.*true'
+
+    - shell: test -n "`grep ^/dev/mapper/docker- /proc/mounts`"
+      
+    - service: name=docker state=stopped
+
+    - shell: test -z "`grep ^/dev/mapper/docker- /proc/mounts`"
+      
+    - service: name=docker state=started
+
+    - shell: test -n "`grep ^/dev/mapper/docker- /proc/mounts`"
+      
+    - shell: docker inspect test02 | grep 'Running.*true'
+
+    - shell: docker rm -f test02
