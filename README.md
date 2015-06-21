@@ -6,7 +6,3 @@ ansible-playbook -i hosts site.yml
 
 ansible-playbook -i hosts test.yml -v
 ```
-
-## diagram
-
-![diagram.png](diagram.png)
