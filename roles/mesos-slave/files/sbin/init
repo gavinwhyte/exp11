@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+# Note: eth1
+IP=`ip -f inet addr | grep 'inet.*eth1' | awk '{print $2}' | cut -d/ -f1`
+
+cat > /etc/hosts <<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+`ip -f inet addr | grep 'inet.*eth1' | awk '{print $2}' | cut -d/ -f1` $HOSTNAME
+EOF
+
+if [ -z "$@" ]; then
+    exec mesos-slave --ip=$IP --master=$MESOS_ZK
+else
+    exec "$@"
+fi

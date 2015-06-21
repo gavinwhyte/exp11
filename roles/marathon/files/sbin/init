@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+# Note: eth1
+IP=`ip -f inet addr | grep 'inet.*eth1' | awk '{print $2}' | cut -d/ -f1`
+
+cat > /etc/hosts <<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+$IP $HOSTNAME
+EOF
+
+if [ -z "$@" ]; then
+    exec  marathon run_jar --http_address $IP --https_address $IP --master $MESOS_ZK --zk `echo $MESOS_ZK | sed 's/mesos/marathon/'`
+else
+    exec "$@"
+fi

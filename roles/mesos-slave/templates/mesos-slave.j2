@@ -1,0 +1,2 @@
+#!/bin/sh -x
+exec docker run -d -e MESOS_ZK='zk://{% for node in groups['nodes'] %}{{ hostvars[node]['ansible_eth1']['ipv4']['address'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/mesos' -e MESOS_CONTAINERIZERS=docker,mesos --name m3s0s-slave --net host --privileged --restart always -v /var/run/docker.sock:/var/run/docker.sock -v /cgroup:/cgroup mesos-slave

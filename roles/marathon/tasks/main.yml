@@ -1,0 +1,16 @@
+---
+- template: src=marathon.j2 dest=/usr/local/sbin/docker-marathon mode=0755
+  register: result
+
+# build
+- file: path=/usr/src/marathon state=absent
+- copy: src=./ dest=/usr/src/marathon
+
+- shell: docker build -t marathon . chdir=/usr/src/marathon
+
+# remote
+- shell: docker rm -f marathon
+  ignore_errors: true
+
+# create
+- shell: /usr/local/sbin/docker-marathon

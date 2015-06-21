@@ -1,0 +1,16 @@
+---
+- template: src=mesos-master.j2 dest=/usr/local/sbin/docker-mesos-master mode=0755
+  register: result
+
+# build
+- file: path=/usr/src/mesos-master state=absent
+- copy: src=./ dest=/usr/src/mesos-master
+
+- shell: docker build -t mesos-master . chdir=/usr/src/mesos-master
+
+# remote
+- shell: docker rm -f m3s0s-master
+  ignore_errors: true
+
+# create
+- shell: /usr/local/sbin/docker-mesos-master

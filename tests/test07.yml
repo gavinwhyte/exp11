@@ -1,0 +1,4 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: docker exec m3s0s-slave docker ps

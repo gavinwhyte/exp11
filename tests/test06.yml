@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: echo ls /mesos | docker run -i --net host --rm zookeeper /opt/zookeeper/bin/zkCli.sh 2> /dev/null | grep {{ item }}
+      with_items:
+#        - info_0000000000
+#        - info_0000000001
+#        - info_0000000002
+        - info_
+
+    - shell: docker run -it --rm -e MESOS_ZK='zk://{% for node in groups['nodes'] %}{{ hostvars[node]['ansible_eth1']['ipv4']['address'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/mesos' --net host mesos-master sh -c 'mesos-resolve $MESOS_ZK' 2> /dev/null | tail -n1 | grep :5050

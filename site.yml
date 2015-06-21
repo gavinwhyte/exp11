@@ -25,3 +25,19 @@
     - zookeeper
 
 - include: tests/test05.yml
+
+- hosts: nodes
+  roles:
+    - mesos-master
+
+- include: tests/test06.yml
+
+- hosts: nodes
+  roles:
+    - mesos-slave
+
+- include: tests/test07.yml
+
+- hosts: nodes
+  roles:
+    - marathon

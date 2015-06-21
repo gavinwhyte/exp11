@@ -1,0 +1,16 @@
+---
+- template: src=mesos-slave.j2 dest=/usr/local/sbin/docker-mesos-slave mode=0755
+  register: result
+
+# build
+- file: path=/usr/src/mesos-slave state=absent
+- copy: src=./ dest=/usr/src/mesos-slave
+
+- shell: docker build -t mesos-slave . chdir=/usr/src/mesos-slave
+
+# remote
+- shell: docker rm -f m3s0s-slave
+  ignore_errors: true
+
+# create
+- shell: /usr/local/sbin/docker-mesos-slave
