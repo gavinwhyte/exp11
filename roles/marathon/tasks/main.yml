@@ -28,3 +28,5 @@
 
 - shell: /usr/local/sbin/docker-marathon
   when: result|failed
+
+- wait_for: port=8080 host={{ ansible_eth1.ipv4.address }} connect_timeout=300
