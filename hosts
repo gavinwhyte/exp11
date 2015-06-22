@@ -1,6 +1,6 @@
 localhost	ansible_connection=local
 
 [nodes]
-node-1	ansible_ssh_host=178.62.52.248 ansible_ssh_user=root
-node-2	ansible_ssh_host=178.62.101.91 ansible_ssh_user=root
-node-3	ansible_ssh_host=178.62.28.185 ansible_ssh_user=root
+node-1	ansible_ssh_host=128.199.236.113 ansible_ssh_user=root
+node-2	ansible_ssh_host=128.199.139.163 ansible_ssh_user=root
+node-3	ansible_ssh_host=128.199.124.67 ansible_ssh_user=root
