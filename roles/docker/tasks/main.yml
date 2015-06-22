@@ -1,6 +1,13 @@
 ---
+- lineinfile: dest=/etc/security/limits.conf line="{{ item }}"
+  with_items:
+    - "* hard nofile 65536"
+    - "* soft nofile 65536"
+  notify: restart docker
+
 - yum: name=docker-io enablerepo=epel-testing
 
 - copy: src=etc/init.d/docker dest=/etc/init.d/docker
+  notify: restart docker
   
 - service: name=docker enabled=yes state=started

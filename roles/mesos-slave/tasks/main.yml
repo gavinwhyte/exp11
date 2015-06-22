@@ -1,16 +1,30 @@
 ---
-- template: src=mesos-slave.j2 dest=/usr/local/sbin/docker-mesos-slave mode=0755
-  register: result
-
 # build
 - file: path=/usr/src/mesos-slave state=absent
 - copy: src=./ dest=/usr/src/mesos-slave
 
 - shell: docker build -t mesos-slave . chdir=/usr/src/mesos-slave
 
-# remote
-- shell: docker rm -f m3s0s-slave
-  ignore_errors: true
+# remove if commandline arguments have changed
+- template: src=mesos-slave.j2 dest=/usr/local/sbin/docker-mesos-slave mode=0755
+  register: result
 
-# create
+# remove if container is not up-to-date
+- shell: test "`docker inspect m3sos-slave | python -c \"import json, sys; print json.load(sys.stdin)[0]['Image']\"`" = "`docker inspect mesos-slave:latest | python -c \"import json, sys; print json.load(sys.stdin)[0]['Id']\"`"
+  ignore_errors: true
+  register: uptodate
+  
+- shell: docker rm -f m3sos-slave
+  ignore_errors: true
+  when: result|changed or uptodate|failed
+
+# start if container is stopped, create if container does not exist
+- shell: docker ps -a | awk '{print $NF}' | grep -q '^m3sos-slave$' && docker inspect m3sos-slave
+  ignore_errors: true
+  register: result
+  
+- shell: docker start m3sos-slave
+  when: "result|success and result.stdout.find('\"Running\": false,') != -1"
+
 - shell: /usr/local/sbin/docker-mesos-slave
+  when: result|failed

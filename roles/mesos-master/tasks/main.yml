@@ -1,16 +1,30 @@
 ---
-- template: src=mesos-master.j2 dest=/usr/local/sbin/docker-mesos-master mode=0755
-  register: result
-
 # build
 - file: path=/usr/src/mesos-master state=absent
 - copy: src=./ dest=/usr/src/mesos-master
 
 - shell: docker build -t mesos-master . chdir=/usr/src/mesos-master
 
-# remote
-- shell: docker rm -f m3s0s-master
-  ignore_errors: true
+# remove if commandline arguments have changed
+- template: src=mesos-master.j2 dest=/usr/local/sbin/docker-mesos-master mode=0755
+  register: result
 
-# create
+# remove if container is not up-to-date
+- shell: test "`docker inspect m3sos-master | python -c \"import json, sys; print json.load(sys.stdin)[0]['Image']\"`" = "`docker inspect mesos-master:latest | python -c \"import json, sys; print json.load(sys.stdin)[0]['Id']\"`"
+  ignore_errors: true
+  register: uptodate
+  
+- shell: docker rm -f m3sos-master
+  ignore_errors: true
+  when: result|changed or uptodate|failed
+
+# start if container is stopped, create if container does not exist
+- shell: docker ps -a | awk '{print $NF}' | grep -q '^m3sos-master$' && docker inspect m3sos-master
+  ignore_errors: true
+  register: result
+  
+- shell: docker start m3sos-master
+  when: "result|success and result.stdout.find('\"Running\": false,') != -1"
+
 - shell: /usr/local/sbin/docker-mesos-master
+  when: result|failed

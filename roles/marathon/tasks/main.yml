@@ -1,16 +1,30 @@
 ---
-- template: src=marathon.j2 dest=/usr/local/sbin/docker-marathon mode=0755
-  register: result
-
 # build
 - file: path=/usr/src/marathon state=absent
 - copy: src=./ dest=/usr/src/marathon
 
 - shell: docker build -t marathon . chdir=/usr/src/marathon
 
-# remote
+# remove if commandline arguments have changed
+- template: src=marathon.j2 dest=/usr/local/sbin/docker-marathon mode=0755
+  register: result
+
+# remove if container is not up-to-date
+- shell: test "`docker inspect marathon | python -c \"import json, sys; print json.load(sys.stdin)[0]['Image']\"`" = "`docker inspect marathon:latest | python -c \"import json, sys; print json.load(sys.stdin)[0]['Id']\"`"
+  ignore_errors: true
+  register: uptodate
+  
 - shell: docker rm -f marathon
   ignore_errors: true
+  when: result|changed or uptodate|failed
 
-# create
+# start if container is stopped, create if container does not exist
+- shell: docker ps -a | awk '{print $NF}' | grep -q '^marathon$' && docker inspect marathon
+  ignore_errors: true
+  register: result
+  
+- shell: docker start marathon
+  when: "result|success and result.stdout.find('\"Running\": false,') != -1"
+
 - shell: /usr/local/sbin/docker-marathon
+  when: result|failed

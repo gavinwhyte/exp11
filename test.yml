@@ -6,3 +6,4 @@
 - include: tests/test05.yml
 - include: tests/test06.yml
 - include: tests/test07.yml
+- include: tests/test08.yml

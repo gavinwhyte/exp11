@@ -41,3 +41,5 @@
 - hosts: nodes
   roles:
     - marathon
+
+- include: tests/test08.yml

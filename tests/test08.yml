@@ -1,0 +1,4 @@
+---
+- hosts: nodes
+  tasks:
+    - shell: curl -f http://{{ ansible_eth1.ipv4.address }}:8080/v2/info

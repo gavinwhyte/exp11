@@ -4,18 +4,32 @@
 - template: src=zoo.cfg.j2 dest=/srv/zookeeper/zoo.cfg
   register: result1
 
-- template: src=zookeeper.j2 dest=/usr/local/sbin/docker-zookeeper mode=0755
-  register: result2
-
 # build
 - file: path=/usr/src/zookeeper state=absent
 - copy: src=./ dest=/usr/src/zookeeper
 
 - shell: docker build -t zookeeper . chdir=/usr/src/zookeeper
 
-# remote
+# remove if commandline arguments have changed
+- template: src=zookeeper.j2 dest=/usr/local/sbin/docker-zookeeper mode=0755
+  register: result
+
+# remove if container is not up-to-date
+- shell: test "`docker inspect zookeeper | python -c \"import json, sys; print json.load(sys.stdin)[0]['Image']\"`" = "`docker inspect zookeeper:latest | python -c \"import json, sys; print json.load(sys.stdin)[0]['Id']\"`"
+  ignore_errors: true
+  register: uptodate
+  
 - shell: docker rm -f zookeeper
   ignore_errors: true
+  when: result|changed or uptodate|failed
 
-# create
+# start if container is stopped, create if container does not exist
+- shell: docker ps -a | awk '{print $NF}' | grep -q '^zookeeper$' && docker inspect zookeeper
+  ignore_errors: true
+  register: result
+  
+- shell: docker start zookeeper
+  when: "result|success and result.stdout.find('\"Running\": false,') != -1"
+
 - shell: /usr/local/sbin/docker-zookeeper
+  when: result|failed
