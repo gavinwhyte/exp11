@@ -1,0 +1,28 @@
+{
+    "id": "bridged-webapp",
+    "cmd": "sh -c 'mkdir /tmp/HERE && cd /tmp/HERE && echo HERE > HERE && python3 -m http.server 8080'",
+    "cpus": 0.05,
+    "mem": 64.0,
+    "instances": 20,
+    "container": {
+	"type": "DOCKER",
+	"docker": {
+	    "image": "python:3",
+	    "network": "BRIDGE",
+	    "portMappings": [
+		{ "containerPort": 8080, "hostPort": 0, "servicePort": 9000, "protocol": "tcp" },
+		{ "containerPort": 161, "hostPort": 0, "protocol": "udp"}
+	    ]
+	}
+    },
+    "healthChecks": [
+	{
+	    "protocol": "COMMAND",
+	    "command": { "value": "curl -f -X GET http://$HOST:$PORT0/" },
+	    "gracePeriodSeconds": 300,
+	    "intervalSeconds": 60,
+	    "timeoutSeconds": 20,
+	    "maxConsecutiveFailures": 3
+	}
+    ]
+}
